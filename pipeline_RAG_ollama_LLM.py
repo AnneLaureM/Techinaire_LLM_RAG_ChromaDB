@@ -62,24 +62,39 @@ def query_ollama_with_weighted_embedding_and_parameters(query,
                                                         top_p=0.1):
 
     results = calculate_weighted_distance(query, collection, title_weight, text_weight)
-    print("results : ", results)
 
     if results:
         best_match_id = results[0][0]
         print(f"🔍 Meilleur ID retourné : {best_match_id}")
 
-        # Récupérer les documents associés à l'ID
-        fetched_data = collection.get(where={"ids": best_match_id})
-        best_match_document = fetched_data['documents']
+        # Retrieve all documents
+        all_docs = collection.get()
+
+        # Extract the lists of IDs, documents, and metadata
+        ids = all_docs.get("ids", [])
+        documents = all_docs.get("documents", [])
+        metadatas = all_docs.get("metadatas", [])
+
+
+        # Check if the ID exists in the list
+        if best_match_id in ids:
+            index = ids.index(best_match_id)
+            retrieved_document = documents[index] if index < len(documents) else "No document found"
+            retrieved_metadata = metadatas[index] if index < len(metadatas) else "No metadata found"
+            
+            print(f"📌 Document for ID {best_match_id}: {retrieved_document}")
+            print(f"🗂 Metadata: {retrieved_metadata}")
+        else:
+            print(f"⚠️ ID {best_match_id} not found in the collection.")
 
         # Affichage pour vérifier la structure
-        print("🔍 Données récupérées pour cet ID :", best_match_document)
-        prompt = f"Contexte :\n{best_match_document}\n\nQuestion : {query}\n\nRéponse :"
+        print("🔍 Données récupérées pour cet ID :", retrieved_document)
+        prompt = f"Contexte :\n{retrieved_document}\n\nQuestion : {query}\n\nRéponse :"
 
 
     else:
         print("⚠️ Aucun résultat pertinent trouvé.")
-        best_match_document = None
+        retrieved_document = None
         prompt = f"⚠️ Aucun contexte disponible.\n\nQuestion : {query}\nRéponse :"
 
     # Construire la commande sans les paramètres invalides
