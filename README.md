@@ -23,7 +23,7 @@ To run this notebook, you need the following:
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/repository-name.git
+   git clone https://github.com/AnneLaureM/Techinaire_LLM_RAG_ChromaDB.git
    ```
 2. Navigate to the directory:
    ```bash
